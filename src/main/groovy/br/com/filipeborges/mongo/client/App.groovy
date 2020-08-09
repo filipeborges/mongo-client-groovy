@@ -3,12 +3,42 @@
  */
 package br.com.filipeborges.mongo.client
 
+import br.com.filipeborges.mongo.client.database.Database
+import org.bson.Document
+
 class App {
-    String getGreeting() {
-        return 'Hello world.'
-    }
 
     static void main(String[] args) {
-        println new App().greeting
+        new App().run()
+    }
+
+    void run() {
+        Database db = new Database()
+        def data = db.getData("c1")
+        def data2 = db.getData("c2")
+        assertAllFieldsEquals(data, data2)
+        pause()
+        db.close()
+    }
+
+    void assertAllFieldsEquals(List<Document> c1, List<Document> c2) {
+        c1.each {
+            def f1 = it["f1"]
+            def f2 = it["f2"]
+            def f3 = it["f3"]
+            def f4 = it["f4"]
+            boolean hasMatch = (c2.find { it["f1"] == f1 && it["f2"] == f2 && it["f3"] == f3 && it["f4"] == f4 }) != null
+            if (!hasMatch) printDocumentInvalidMatch(it)
+        }
+    }
+
+    void printDocumentInvalidMatch(Document doc) {
+        System.out.println("========== Invalid Document Match ==============")
+        System.out.println(doc)
+    }
+
+    void pause() {
+        System.out.println("===== FINISHED =====")
+        new Scanner(System.in).nextLine()
     }
 }

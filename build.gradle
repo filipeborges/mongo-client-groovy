@@ -24,6 +24,9 @@ dependencies {
     // Use the latest Groovy version for building this library
     implementation 'org.codehaus.groovy:groovy-all:2.5.8'
 
+    // Mongo driver
+    implementation 'org.mongodb:mongodb-driver-sync:4.1.0'
+
     // Use the awesome Spock testing and specification framework
     testImplementation 'org.spockframework:spock-core:1.3-groovy-2.5'
 }
