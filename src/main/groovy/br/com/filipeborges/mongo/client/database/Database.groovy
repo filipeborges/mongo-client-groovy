@@ -5,6 +5,7 @@ import com.mongodb.client.MongoClients
 import com.mongodb.client.MongoCollection
 import com.mongodb.client.MongoDatabase
 import com.mongodb.client.model.Filters
+import com.mongodb.client.model.Projections
 import org.bson.Document
 
 class Database {
@@ -37,7 +38,14 @@ class Database {
     def getData(String collectionName) {
         List<Document> data = []
         MongoCollection<Document> collection = db.getCollection(collectionName)
-        collection.find().each {
+        collection.find()
+                .projection(
+                        Projections.fields(
+                                Projections.include("f1", "f2", "f3", "f4"),
+                                Projections.excludeId()
+                        )
+                )
+                .each {
             data.add(it)
         }
         return data
@@ -53,7 +61,14 @@ class Database {
                         Filters.in("f3", filterData["f3"]),
                         Filters.in("f4", filterData["f4"])
                 )
-        ).each { data.add(it) }
+        )
+                .projection(
+                        Projections.fields(
+                                Projections.include("f1", "f2", "f3", "f4"),
+                                Projections.excludeId()
+                        )
+                )
+                .each { data.add(it) }
         System.out.println("TOTAL DOCUMENTS FINDED: ${data.size()}")
         return data
     }
