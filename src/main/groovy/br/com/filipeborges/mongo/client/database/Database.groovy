@@ -4,6 +4,7 @@ import com.mongodb.client.MongoClient
 import com.mongodb.client.MongoClients
 import com.mongodb.client.MongoCollection
 import com.mongodb.client.MongoDatabase
+import com.mongodb.client.model.Filters
 import org.bson.Document
 
 class Database {
@@ -39,6 +40,21 @@ class Database {
         collection.find().each {
             data.add(it)
         }
+        return data
+    }
+
+    def findFiltered(def filterData, String collectionName) {
+        List<Document> data = []
+        MongoCollection<Document> collection = db.getCollection(collectionName)
+        collection.find(
+                Filters.and(
+                        Filters.in("f1", filterData["f1"]),
+                        Filters.in("f2", filterData["f2"]),
+                        Filters.in("f3", filterData["f3"]),
+                        Filters.in("f4", filterData["f4"])
+                )
+        ).each { data.add(it) }
+        System.out.println("TOTAL DOCUMENTS FINDED: ${data.size()}")
         return data
     }
 }

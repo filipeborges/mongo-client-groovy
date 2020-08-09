@@ -14,9 +14,7 @@ class App {
 
     void run() {
         Database db = new Database()
-        def data = db.getData("c1")
-        def data2 = db.getData("c2")
-        assertAllFieldsEquals(data, data2)
+        verifyCollectionsMatch("c1", "c2", db)
         pause()
         db.close()
     }
@@ -30,6 +28,40 @@ class App {
             boolean hasMatch = (c2.find { it["f1"] == f1 && it["f2"] == f2 && it["f3"] == f3 && it["f4"] == f4 }) != null
             if (!hasMatch) printDocumentInvalidMatch(it)
         }
+    }
+
+    void verifyCollectionsMatch(String c1Name, String c2Name, Database db) {
+        def c1 = db.getData(c1Name)
+        List<Document> docsToSearch = []
+
+        for (int i = 0; i < c1.size(); i++) {
+            docsToSearch.add(c1.get(i))
+            if (i % 10 == 0) {
+                verifyMatch(docsToSearch, c2Name, db)
+                docsToSearch = []
+            }
+        }
+
+        // Remaining
+        verifyMatch(docsToSearch, c2Name, db)
+    }
+
+    void verifyMatch(List<Document> docsToSearch, String c2, Database db) {
+        def filter = [
+                "f1": [],
+                "f2": [],
+                "f3": [],
+                "f4": []
+        ]
+
+        docsToSearch.each {
+            filter["f1"].add(it["f1"])
+            filter["f2"].add(it["f2"])
+            filter["f3"].add(it["f3"])
+            filter["f4"].add(it["f4"])
+        }
+        def result = db.findFiltered(filter, c2)
+        assertAllFieldsEquals(docsToSearch, result)
     }
 
     void printDocumentInvalidMatch(Document doc) {
